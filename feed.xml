@@ -1,3 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://mikeframpo.net/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mikeframpo.net/" rel="alternate" type="text/html" /><updated>2021-06-19T21:26:34+12:00</updated><id>https://mikeframpo.net/feed.xml</id><title type="html">Mike’s Computer Page</title><entry><title type="html">Hai Jo!</title><link href="https://mikeframpo.net/2021/06/19/hi-jo.html" rel="alternate" type="text/html" title="Hai Jo!" /><published>2021-06-19T00:00:00+12:00</published><updated>2021-06-19T00:00:00+12:00</updated><id>https://mikeframpo.net/2021/06/19/hi-jo</id><content type="html" xml:base="https://mikeframpo.net/2021/06/19/hi-jo.html">&lt;p&gt;Nothing to see here.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://mikeframpo.net/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mikeframpo.net/" rel="alternate" type="text/html" /><updated>2021-06-20T11:50:04+12:00</updated><id>https://mikeframpo.net/feed.xml</id><title type="html">Mike’s Computer Page</title><entry><title type="html">yocto-debugging-gdb</title><link href="https://mikeframpo.net/2021/06/20/yocto-debugging-gdb.html" rel="alternate" type="text/html" title="yocto-debugging-gdb" /><published>2021-06-20T11:42:00+12:00</published><updated>2021-06-20T11:42:00+12:00</updated><id>https://mikeframpo.net/2021/06/20/yocto-debugging-gdb</id><content type="html" xml:base="https://mikeframpo.net/2021/06/20/yocto-debugging-gdb.html">&lt;h1 id=&quot;debugging-gdb-programs-on-yocto-projects&quot;&gt;Debugging GDB Programs on Yocto projects&lt;/h1&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/lil-stumped.jpg&quot; alt=&quot;Nothing to see here&quot; /&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">Nothing to see here.</summary></entry></feed>
+&lt;h3 id=&quot;localconf&quot;&gt;local.conf&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IMAGE_INSTALL_append = &quot;gdbserver&quot;
+EXTRA_IMAGE_FEATURES += &quot;debug-tweaks&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;gdb-with-tui-support-optional&quot;&gt;GDB with tui support (optional)&lt;/h3&gt;
+&lt;p&gt;Create recipe in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;meta-foo/recipes-devtools/gdb/gdb-%.bbappend&lt;/code&gt; and insert&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;EXTRA_OECONF_remove = &quot; --disable-tui&quot;
+EXTRA_OECONF += &quot; --enable-tui&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;sdk&quot;&gt;SDK&lt;/h3&gt;
+
+&lt;p&gt;Use the extensible SDK, built using, e.g.,
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bitbake -c populate_sdk_ext core-image-minimal&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.yoctoproject.org/docs/current/mega-manual/mega-manual.html#sdk-dev-environment&quot;&gt;eSDK documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ devtool modify &amp;lt;recipe&amp;gt;&lt;/code&gt; &lt;a href=&quot;https://docs.yoctoproject.org/sdk-manual/extensible.html#use-devtool-modify-to-modify-the-source-of-an-existing-component&quot;&gt;docs here&lt;/a&gt; to build and then install packages to be debugged into the eSDK.&lt;/p&gt;
+
+&lt;p&gt;I think using devtool, in most cases, automatically enables debug symbols, and installs them to the host sysroot, so they don’t have to be installed to the target.&lt;/p&gt;
+
+&lt;p&gt;Then build and deploy&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ devtool build recipe
+$ devtool deploy-target &amp;lt;recipe&amp;gt; root@&amp;lt;machine-ip&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Run GDB on the target&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# gdbserver localhost:1234 &amp;lt;prog&amp;gt; &amp;lt;args...&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Run GDB on the host, within the sdk env&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ $GDB
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then in gdb connect and debug&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;(gdb) target remote &amp;lt;machine-ip&amp;gt;:1234
+(gdb) b main
+(gdb) c
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><summary type="html">Debugging GDB Programs on Yocto projects</summary></entry></feed>
