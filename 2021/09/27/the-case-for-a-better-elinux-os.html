@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>The case for a better embedded Linux operating system | Mike Frampton</title>
+<meta name="generator" content="Jekyll v4.2.0" />
+<meta property="og:title" content="The case for a better embedded Linux operating system" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Embedded/IoT systems have proliferated in recent years. The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products. The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market. I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system. In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar. And I think that in most cases this is a mistake. In this post I’d like to outline why I think this." />
+<meta property="og:description" content="Embedded/IoT systems have proliferated in recent years. The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products. The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market. I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system. In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar. And I think that in most cases this is a mistake. In this post I’d like to outline why I think this." />
+<link rel="canonical" href="https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html" />
+<meta property="og:url" content="https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html" />
+<meta property="og:site_name" content="Mike Frampton" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-27T09:16:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The case for a better embedded Linux operating system" />
+<script type="application/ld+json">
+{"description":"Embedded/IoT systems have proliferated in recent years. The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products. The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market. I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system. In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar. And I think that in most cases this is a mistake. In this post I’d like to outline why I think this.","@type":"BlogPosting","headline":"The case for a better embedded Linux operating system","dateModified":"2021-09-27T09:16:00+01:00","datePublished":"2021-09-27T09:16:00+01:00","url":"https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://mikeframpo.net/feed.xml" title="Mike Frampton" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Mike Frampton</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">The case for a better embedded Linux operating system</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2021-09-27T09:16:00+01:00" itemprop="datePublished">Sep 27, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Embedded/IoT systems have proliferated in recent years.
+The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products.
+The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market.
+I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system.
+In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar.
+And I think that in most cases this is a mistake.
+In this post I’d like to outline why I think this.</p>
+
+<h2 id="package-bloat">Package Bloat</h2>
+<p>Many of the mainstream Linux distributions (Ubuntu, Debian, Arch, Fedora), produce arm compatible builds, and support a wide variety of arm-based SBCs.
+Typically a default install of these systems consumes 1-2 GB of flash storage.
+Big deal right? Storage is cheap now.
+Unless you’re looking at building multiple thousands of devices, including an SD card or eMMC with multiple gigabytes probably isn’t a significant factor in your costs.</p>
+
+<p>Even if you don’t care about storage cost, you should still reduce the amount of <em>stuff</em> you install on the device.
+The reason is because a <em>small</em> system, in which the developer has selected the installed packages in an <em>understood</em> system.
+If you’ve gone through the process of manually selecting a package to install, and at least spent a few minutes checking the configuration, you stand a much better chance of being able to debug that feature when it doesn’t go to plan.</p>
+
+<p>There’s also an argument to be made that reducing bloat reduces the <em>surface area</em> for potential security vulnerabilities.
+Perhaps its a good idea to force the developer to perform some basic configuration for each package.
+Then they’ll have some understanding of potential security trade-offs in each package.</p>
+
+<h2 id="software-updates">Software updates</h2>
+<p>For most people it’s really important to be able to remotely update both system-level and application software running on devices.
+For desktop-style Linux distributions, the system is updated on a package basis.
+For an embedded system, you really don’t want that level of control on a device, at least not in production.
+You can easily get into a situation where a fleet of devices are all running subtly different software.
+In such a situation, it’s not feasible to produce a <em>definitive version</em> number for the running software.
+This is always required when it comes to debugging a failure in the field.
+Fleet managers <em>need</em> to be able to distribute <em>discrete</em> updates to the system.
+Such an update will typically contain the core OS, user-space components, and the application code, all bundled into one monolithic (or sometimes incremental) update.</p>
+
+<h2 id="os-images">OS Images</h2>
+<p>Another shortfall of desktop-like operating systems is the difficulty of creating an installable image.
+You can, of course, just image the flash storage of a known working system and deploy it across a range of devices.
+Unfortunately this is pretty common when deploying RPi (and similar) systems.
+This is far from ideal, however, as it doesn’t encode the steps required to get to that point, which makes future upgrades and bug fixes really difficult.</p>
+
+<p>There are a few <em>bootstrapping</em> systems for desktop Linux OS’s such as pacstrap on Arch or debootstrap on Debian.
+I believe these can be used to build a rootfs into a target folder, though I haven’t used either of them myself.
+I don’t think these systems would, by themselves, solve any of the aforementioned issues with packages and versioning.
+And I assume the build process would be more like: install Debian and then slim it down, rather than build up from scratch, though please correct me here if I’m way off.</p>
+
+<h2 id="the-problem-with-yocto-and-buildroot">The problem with Yocto and Buildroot</h2>
+<p>If you know something about this problem space, you’re likely thinking “Duh… that’s why people use Yocto/Buildroot.”
+And yes, I concede that these tools solve all of the aforementioned problems.
+They both take some input metadata describing what needs to be built, and (cross) compile an image that can be installed directly on the target board.
+The issue with these systems is they they’re out of reach for most developers.
+Let me explain why.</p>
+
+<p>These systems are incredibly complex beasts, particularly Yocto, which I believe is the most widely used embedded Linux build system available.
+It takes some serious effort to get a basic working knowledge of the Yocto build system.
+Have a read through the <a href="https://www.yoctoproject.org/docs/latest/mega-manual/mega-manual.html">Yocto Mega Manual</a> before bed and you’ll see what I mean.
+Buildroot is much more approachable, though less supported and less feature rich, and still requires a good knowledge of fundamental Linux tools.</p>
+
+<p>Investing the time and effort to learning the build tool isn’t enough though.
+The build tool is really just a assistant which helps you through the complexities of a compilation toolchain, kernel, bootloader, drivers, package configuration and compilation, rootfs build, and target image creation.
+In most cases you need to have some knowledge of each of these areas, as you’ll need to help the build tool along, especially if you’re working on custom hardware.
+For these reasons, many manufacturers look to contractors who specialise in these tools.
+Or, they just use Raspbian OS and live with the issues.</p>
+
+<h2 id="potential-solution">Potential solution</h2>
+<p>So what is the solution?
+I think that containers have a lot of promise in the embedded space.
+They allow an application image to be deployed on top of a core OS without having to manually edit files within package build scripts.
+They potentially solve the problems of imaging the OS, and also make updating the system atomic.
+They also potentially sidestep the difficulties of the Yocto/Buildroot systems, assuming a user-friendly package manager can be used to generate the container itself.
+In theory, the underlying build system would only be necessary for producing the core OS and board support, etc.
+There are already a number of OS solutions on the market employing containers, such as
+<a href="https://www.balena.io/">balena OS</a>,
+<a href="https://foundries.io/products/">Foundries.io Linux microPlatform</a>,
+and <a href="https://www.toradex.com/operating-systems/torizon-core">TorizonCore</a>.
+I’d be very interested to hear feedback from anyone who has used one of these platforms extensively.
+I’m unsure what the required system resources are for the container engine.
+Would these solutions be applicable to very small embedded systems?
+I’m also concerned that it’s potentially easy to reproduce the functionality of a desktop Linux OS within a container.
+And thus reproduce many of the aforementioned problems in the article.</p>
+
+<p>Overall, I think a container based approach could be a big step forward in enabling developers to bring their application to market.
+I will be continuing to investigate this space in the near future.</p>
+
+  </div><a class="u-url" href="/2021/09/27/the-case-for-a-better-elinux-os.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Mike Frampton</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Mike Frampton</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/mikeframpo"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">mikeframpo</span></a></li><li><a href="https://www.twitter.com/frampytown"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">frampytown</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

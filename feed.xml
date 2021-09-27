@@ -1,4 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://mikeframpo.net/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mikeframpo.net/" rel="alternate" type="text/html" /><updated>2021-09-24T12:43:03+01:00</updated><id>https://mikeframpo.net/feed.xml</id><title type="html">Mike Frampton</title><entry><title type="html">Yocto: Debugging programs on the target using GDB</title><link href="https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb.html" rel="alternate" type="text/html" title="Yocto: Debugging programs on the target using GDB" /><published>2021-06-20T00:42:00+01:00</published><updated>2021-06-20T00:42:00+01:00</updated><id>https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb</id><content type="html" xml:base="https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb.html">&lt;h1 id=&quot;yocto-debugging-programs-on-the-target-using-gdb&quot;&gt;Yocto: Debugging programs on the target using GDB&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://mikeframpo.net/feed.xml" rel="self" type="application/atom+xml" /><link href="https://mikeframpo.net/" rel="alternate" type="text/html" /><updated>2021-09-27T09:19:44+01:00</updated><id>https://mikeframpo.net/feed.xml</id><title type="html">Mike Frampton</title><entry><title type="html">The case for a better embedded Linux operating system</title><link href="https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html" rel="alternate" type="text/html" title="The case for a better embedded Linux operating system" /><published>2021-09-27T09:16:00+01:00</published><updated>2021-09-27T09:16:00+01:00</updated><id>https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os</id><content type="html" xml:base="https://mikeframpo.net/2021/09/27/the-case-for-a-better-elinux-os.html">&lt;p&gt;Embedded/IoT systems have proliferated in recent years.
+The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products.
+The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market.
+I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system.
+In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar.
+And I think that in most cases this is a mistake.
+In this post I’d like to outline why I think this.&lt;/p&gt;
+
+&lt;h2 id=&quot;package-bloat&quot;&gt;Package Bloat&lt;/h2&gt;
+&lt;p&gt;Many of the mainstream Linux distributions (Ubuntu, Debian, Arch, Fedora), produce arm compatible builds, and support a wide variety of arm-based SBCs.
+Typically a default install of these systems consumes 1-2 GB of flash storage.
+Big deal right? Storage is cheap now.
+Unless you’re looking at building multiple thousands of devices, including an SD card or eMMC with multiple gigabytes probably isn’t a significant factor in your costs.&lt;/p&gt;
+
+&lt;p&gt;Even if you don’t care about storage cost, you should still reduce the amount of &lt;em&gt;stuff&lt;/em&gt; you install on the device.
+The reason is because a &lt;em&gt;small&lt;/em&gt; system, in which the developer has selected the installed packages in an &lt;em&gt;understood&lt;/em&gt; system.
+If you’ve gone through the process of manually selecting a package to install, and at least spent a few minutes checking the configuration, you stand a much better chance of being able to debug that feature when it doesn’t go to plan.&lt;/p&gt;
+
+&lt;p&gt;There’s also an argument to be made that reducing bloat reduces the &lt;em&gt;surface area&lt;/em&gt; for potential security vulnerabilities.
+Perhaps its a good idea to force the developer to perform some basic configuration for each package.
+Then they’ll have some understanding of potential security trade-offs in each package.&lt;/p&gt;
+
+&lt;h2 id=&quot;software-updates&quot;&gt;Software updates&lt;/h2&gt;
+&lt;p&gt;For most people it’s really important to be able to remotely update both system-level and application software running on devices.
+For desktop-style Linux distributions, the system is updated on a package basis.
+For an embedded system, you really don’t want that level of control on a device, at least not in production.
+You can easily get into a situation where a fleet of devices are all running subtly different software.
+In such a situation, it’s not feasible to produce a &lt;em&gt;definitive version&lt;/em&gt; number for the running software.
+This is always required when it comes to debugging a failure in the field.
+Fleet managers &lt;em&gt;need&lt;/em&gt; to be able to distribute &lt;em&gt;discrete&lt;/em&gt; updates to the system.
+Such an update will typically contain the core OS, user-space components, and the application code, all bundled into one monolithic (or sometimes incremental) update.&lt;/p&gt;
+
+&lt;h2 id=&quot;os-images&quot;&gt;OS Images&lt;/h2&gt;
+&lt;p&gt;Another shortfall of desktop-like operating systems is the difficulty of creating an installable image.
+You can, of course, just image the flash storage of a known working system and deploy it across a range of devices.
+Unfortunately this is pretty common when deploying RPi (and similar) systems.
+This is far from ideal, however, as it doesn’t encode the steps required to get to that point, which makes future upgrades and bug fixes really difficult.&lt;/p&gt;
+
+&lt;p&gt;There are a few &lt;em&gt;bootstrapping&lt;/em&gt; systems for desktop Linux OS’s such as pacstrap on Arch or debootstrap on Debian.
+I believe these can be used to build a rootfs into a target folder, though I haven’t used either of them myself.
+I don’t think these systems would, by themselves, solve any of the aforementioned issues with packages and versioning.
+And I assume the build process would be more like: install Debian and then slim it down, rather than build up from scratch, though please correct me here if I’m way off.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-problem-with-yocto-and-buildroot&quot;&gt;The problem with Yocto and Buildroot&lt;/h2&gt;
+&lt;p&gt;If you know something about this problem space, you’re likely thinking “Duh… that’s why people use Yocto/Buildroot.”
+And yes, I concede that these tools solve all of the aforementioned problems.
+They both take some input metadata describing what needs to be built, and (cross) compile an image that can be installed directly on the target board.
+The issue with these systems is they they’re out of reach for most developers.
+Let me explain why.&lt;/p&gt;
+
+&lt;p&gt;These systems are incredibly complex beasts, particularly Yocto, which I believe is the most widely used embedded Linux build system available.
+It takes some serious effort to get a basic working knowledge of the Yocto build system.
+Have a read through the &lt;a href=&quot;https://www.yoctoproject.org/docs/latest/mega-manual/mega-manual.html&quot;&gt;Yocto Mega Manual&lt;/a&gt; before bed and you’ll see what I mean.
+Buildroot is much more approachable, though less supported and less feature rich, and still requires a good knowledge of fundamental Linux tools.&lt;/p&gt;
+
+&lt;p&gt;Investing the time and effort to learning the build tool isn’t enough though.
+The build tool is really just a assistant which helps you through the complexities of a compilation toolchain, kernel, bootloader, drivers, package configuration and compilation, rootfs build, and target image creation.
+In most cases you need to have some knowledge of each of these areas, as you’ll need to help the build tool along, especially if you’re working on custom hardware.
+For these reasons, many manufacturers look to contractors who specialise in these tools.
+Or, they just use Raspbian OS and live with the issues.&lt;/p&gt;
+
+&lt;h2 id=&quot;potential-solution&quot;&gt;Potential solution&lt;/h2&gt;
+&lt;p&gt;So what is the solution?
+I think that containers have a lot of promise in the embedded space.
+They allow an application image to be deployed on top of a core OS without having to manually edit files within package build scripts.
+They potentially solve the problems of imaging the OS, and also make updating the system atomic.
+They also potentially sidestep the difficulties of the Yocto/Buildroot systems, assuming a user-friendly package manager can be used to generate the container itself.
+In theory, the underlying build system would only be necessary for producing the core OS and board support, etc.
+There are already a number of OS solutions on the market employing containers, such as
+&lt;a href=&quot;https://www.balena.io/&quot;&gt;balena OS&lt;/a&gt;,
+&lt;a href=&quot;https://foundries.io/products/&quot;&gt;Foundries.io Linux microPlatform&lt;/a&gt;,
+and &lt;a href=&quot;https://www.toradex.com/operating-systems/torizon-core&quot;&gt;TorizonCore&lt;/a&gt;.
+I’d be very interested to hear feedback from anyone who has used one of these platforms extensively.
+I’m unsure what the required system resources are for the container engine.
+Would these solutions be applicable to very small embedded systems?
+I’m also concerned that it’s potentially easy to reproduce the functionality of a desktop Linux OS within a container.
+And thus reproduce many of the aforementioned problems in the article.&lt;/p&gt;
+
+&lt;p&gt;Overall, I think a container based approach could be a big step forward in enabling developers to bring their application to market.
+I will be continuing to investigate this space in the near future.&lt;/p&gt;</content><author><name></name></author><summary type="html">Embedded/IoT systems have proliferated in recent years. The rise of the Raspberry Pi, in particular, has made it easier than even for non-embedded system developers to build and ship IoT products. The RPi’s wide use in industry has even prompted the release of the RPi Compute Module system on module (SoM), which enables higher quality RPi devices to reach that market. I’d argue that the wide use of the RPi both in prototyping and in real products is, at least in part, due to the ease with which software can be set up on the system. In most cases, developers building devices using RPis, or similar single board computers (SBCs), use a desktop-like OS, such as Raspbian, Debian, Arch, or similar. And I think that in most cases this is a mistake. In this post I’d like to outline why I think this.</summary></entry><entry><title type="html">Yocto: Debugging programs on the target using GDB</title><link href="https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb.html" rel="alternate" type="text/html" title="Yocto: Debugging programs on the target using GDB" /><published>2021-06-20T00:42:00+01:00</published><updated>2021-06-20T00:42:00+01:00</updated><id>https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb</id><content type="html" xml:base="https://mikeframpo.net/notes/2021/06/20/yocto-debugging-gdb.html">&lt;h1 id=&quot;yocto-debugging-programs-on-the-target-using-gdb&quot;&gt;Yocto: Debugging programs on the target using GDB&lt;/h1&gt;
 
 &lt;h3 id=&quot;localconf&quot;&gt;local.conf&lt;/h3&gt;
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IMAGE_INSTALL_append = &quot;gdbserver&quot;
